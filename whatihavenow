@@ -1,0 +1,33 @@
+#commodity project
+#Import data on rain monthly and then soybean and corn prices with a buy or sell each month
+# also print out pretty graphs of differences in prices and rain
+
+import urllib
+import json
+import pandas as pd
+import matplotlib.pyplot as plt
+
+args = {
+    'start' : '200001010000'
+    'end' : '202001010000'
+    'obtimezone' : 'UTC'
+    'pmode' : 'intervals'
+    'interval' : 'month'
+    #'token' : [tokenstring]
+}
+# use api args info at https://developers.synopticdata.com/mesonet/v2/stations/precipitation/
+
+#pull data and convert into dictionary for weather
+
+apiString = urllib.urlencode(args)
+url = 'https://api.synopticdata.com/v2/stations/precip'
+fullUrl = '{}?{}'.format(url,apistring)
+response = urllib.urlopen(fullUrl)
+responseDict = json.loads(response.read())
+# might pull error, use tester tool at atmos.uw.edu to test
+
+#start panda analyzing
+dateTime = responseDict['STATION'][0]['OBSERVATIONS']['date_time']
+#airT = responseDict['STATION'][0]['OBSERVATIONS']['air_temp_set_1']
+ksea = pd.Series(airT,index = pd.to_datetime(dateTime))
+
