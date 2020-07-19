@@ -1,24 +1,26 @@
 #commodity project
-#Import data on rain monthly and then soybean and corn prices with a buy or sell each month
+#Import data on rain monthly and then soybean prices with a buy or sell each month
 # also print out pretty graphs of differences in prices and rain
 
 import urllib
 import json
 import pandas as pd
 import matplotlib.pyplot as plt
+import quandl
+import numpy as np
 
 args = {
-    'start' : '200001010000'
-    'end' : '202001010000'
-    'obtimezone' : 'UTC'
-    'pmode' : 'intervals'
-    'interval' : 'month'
+    'start' : '200001010000',
+    'end' : '202001010000',
+    'obtimezone' : 'UTC',
+    'pmode' : 'intervals',
+    'interval' : 'month',
+    #'precipitation' : '',
     #'token' : [tokenstring]
 }
 # use api args info at https://developers.synopticdata.com/mesonet/v2/stations/precipitation/
 
 #pull data and convert into dictionary for weather
-
 apiString = urllib.urlencode(args)
 url = 'https://api.synopticdata.com/v2/stations/precip'
 fullUrl = '{}?{}'.format(url,apistring)
@@ -26,8 +28,31 @@ response = urllib.urlopen(fullUrl)
 responseDict = json.loads(response.read())
 # might pull error, use tester tool at atmos.uw.edu to test
 
-#start panda analyzing
+#input into panda frame
 dateTime = responseDict['STATION'][0]['OBSERVATIONS']['date_time']
-#airT = responseDict['STATION'][0]['OBSERVATIONS']['air_temp_set_1']
-ksea = pd.Series(airT,index = pd.to_datetime(dateTime))
+precipitation = responseDict['STATION'][0]['OBSERVATIONS']['total_precip_value_1']
+totalrain = pd.Series(total_precip_value_1,index = pd.to_datetime(dateTime))
 
+# get the data from quandl with same date range
+#https://www.quandl.com/data/TFGRAIN/SOYBEANS
+soybeandata = quandl.get('TFGRAIN/SOYBEANS', column_index = '1' ,start_date="2000-01-01", end_date="2020-01-01", collapse="monthly")
+
+#create new dicitonary with combined data to align correctly and not change individual dictionary
+# and requires pandas to start so should be correct
+combined_data = {**totalrain, **soybeandata}
+
+#check data alignment and simple stats of data set
+mean1 = combined_data['precipitation'].mean()
+mean2 = combined_data['TFGRAIN/SOYBEANS'].mean()
+count1 = combined_data['precipitation'].count()
+count2 = combined_data['TFGRAIN/SOYBEANS'].count()
+std = combined_data['TFGRAIN/SOYBEANS'].std()
+var = combined_data['TFGRAIN/SOYBEANS'].var()
+
+#output simple data points and head rows
+print('mean precipitation : ' + str(mean1))
+print('mean price : ' + str(mean2))
+print('count of precipitation : ' + str(count1))
+print('count of prices : ' + str(count2))
+print('standard deviation of prices : ' + str(std))
+print('variance of prices : ' + str(var))
