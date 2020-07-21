@@ -1,0 +1,19 @@
+the problem to be solved is to create a mechanical answer to how much rain in the usa will affect soybean prices.
+the rainfall amount will be based on monthly reports and year over year changes for comparison. 
+Example:  2019 May rainfall over usa is 3% higher than 2018 May rainfall so soybean production should be higher by 3%.
+For this project, if the production goes higher for that month, an order to sell will be issued and if the production goes down, an order to buy will be issued.
+
+General algorithm is:
+assume 100,000 for initial cash, disregard settlement costs, assume all futures are rolled forward.
+
+
+if rainfall month over month change is positive and not more than 10% change (avoid major weather changes)
+  sell soybean
+elif rainfall month over month is negative and not more than -10% change
+  buy soybean
+else
+  hold position
+
+use publicly available weather information(narrow by relevant states for production if I can find it for free)
+use publicly available commodity information
+plot backtest results for the last 20 years.
